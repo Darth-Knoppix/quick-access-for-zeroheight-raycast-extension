@@ -42,6 +42,14 @@ export interface StyleguidePageResponse {
   };
 }
 
+export interface PageStatusResponse {
+  status: string;
+  data: {
+    id: string;
+    name: string;
+  };
+}
+
 export function formatPageName(name?: string) {
   if (name === "___cover") {
     return "Cover Page";
@@ -78,4 +86,21 @@ export function getContentOrDefault(page: Pick<StyleguidePageData, "tabs" | "con
   }
 
   return page.content;
+}
+
+export function statusIdToColor(id?: string) {
+  console.log(id);
+  if (!id) return "#F2F1F2";
+
+  return (
+    {
+      new: "#E1FFF0",
+      ready: "#E1FFF0",
+      in_progress: "#E2F1FF",
+      to_do: "#FFFCC3",
+      deprecated: "#FFE9E8",
+      beta: "#F2F1F2",
+      not_applicable: "#F2F1F2",
+    }?.[id] ?? "#F2F1F2"
+  );
 }

@@ -1,9 +1,9 @@
-import { ActionPanel, Action, List, getPreferenceValues } from "@raycast/api";
-import { useFetch, useCachedState } from "@raycast/utils";
+import { ActionPanel, Action, List } from "@raycast/api";
+import { useCachedState } from "@raycast/utils";
 import { useEffect, useState } from "react";
 
-import { BASE_URL, formatPageName, getAuthHeaders, StyleguidePageListResponse } from "../utils";
 import { StyleguidePage } from "./StyleguidePage";
+import { usePageList } from "../hooks/usePageList";
 
 interface StyleguidePageListProps {
   styleguideId: number;
@@ -11,36 +11,10 @@ interface StyleguidePageListProps {
 }
 
 export function StyleguidePageList({ styleguideId, styleguideName }: StyleguidePageListProps) {
-  const { clientId, accessToken } = getPreferenceValues<Preferences>();
   const [sorting, setSorting] = useCachedState("page-list-sorting", "name");
 
-  if (!clientId || !accessToken) {
-    return null;
-  }
+  const { data, isLoading, revalidate } = usePageList(styleguideId);
 
-  const { data, isLoading, revalidate } = useFetch(`${BASE_URL}/styleguides/${styleguideId}/pages`, {
-    method: "GET",
-    headers: getAuthHeaders(clientId, accessToken),
-    mapResult(rawResponse: StyleguidePageListResponse) {
-      const pages = rawResponse.data.pages.map((page) => {
-        const createdAt = new Date(page.created_at);
-        const updatedAt = new Date(page.updated_at || page.created_at);
-
-        return {
-          ...page,
-          name: formatPageName(page.name),
-          createdAt,
-          humanCreatedAtDate: createdAt.toLocaleDateString(),
-          updatedAt,
-          humanUpdatedAtDate: updatedAt.toLocaleDateString(),
-        };
-      });
-
-      return {
-        data: pages,
-      };
-    },
-  });
   const [sortedPages, setSortedPages] = useState(data);
 
   useEffect(() => {

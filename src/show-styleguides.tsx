@@ -1,46 +1,15 @@
-import { ActionPanel, Action, List, getPreferenceValues } from "@raycast/api";
-import { useFetch, useCachedState } from "@raycast/utils";
+import { ActionPanel, Action, List } from "@raycast/api";
+import { useCachedState } from "@raycast/utils";
 import { useEffect, useState } from "react";
 
-import { BASE_URL, getAuthHeaders, StyleguideListItemData, StyleguideListResponse } from "./utils";
+import { StyleguideListItemData } from "./utils";
 import { StyleguidePageList } from "./subviews/StyleguidePageList";
+import { useStyleguideList } from "./hooks/useStyleguideList";
 
 export default function Command() {
-  const { clientId, accessToken } = getPreferenceValues<Preferences>();
   const [sorting, setSorting] = useCachedState("styleguide-list-sorting", "name");
 
-  const { data, isLoading, revalidate } = useFetch<
-    StyleguideListResponse,
-    StyleguideListItemData[],
-    StyleguideListItemData[]
-  >(BASE_URL + "/styleguides", {
-    method: "GET",
-    headers: getAuthHeaders(clientId, accessToken),
-    keepPreviousData: true,
-    failureToastOptions: {
-      title: "Failed to get styleguide list",
-      message: "Please try again later",
-      primaryAction: {
-        title: "Reload styleguide list",
-        onAction: (toast) => {
-          revalidate();
-          toast.hide();
-        },
-      },
-    },
-    mapResult(rawResponse) {
-      const styleguides = rawResponse.data.styleguides.map((styleguide) => ({
-        ...styleguide,
-        name: styleguide.name ?? "Untitled styleguide",
-        humanCreatedAt: new Date(styleguide.created_at).toLocaleDateString(),
-        createdAt: new Date(styleguide.created_at),
-      }));
-
-      return {
-        data: styleguides,
-      };
-    },
-  });
+  const { data, isLoading, revalidate } = useStyleguideList();
   const [sortedStyleguides, setSortedStyleguides] = useState<StyleguideListItemData[]>([]);
 
   useEffect(() => {

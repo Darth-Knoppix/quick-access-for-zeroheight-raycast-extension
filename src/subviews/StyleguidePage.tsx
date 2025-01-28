@@ -1,59 +1,15 @@
-import { Action, ActionPanel, Detail, getPreferenceValues, Icon } from "@raycast/api";
-import { useFetch } from "@raycast/utils";
+import { Action, ActionPanel, Detail, Icon } from "@raycast/api";
 
-import {
-  BASE_URL,
-  formatPageName,
-  getAuthHeaders,
-  getContentOrDefault,
-  isContentEmpty,
-  StyleguidePageResponse,
-} from "../utils";
+import { getContentOrDefault, isContentEmpty } from "../utils";
+import { StyleguideStatusTagDetailMetadataLabel } from "./StyleguideStatusTagDetailMetadataLabel";
+import { usePage } from "../hooks/usePage";
 
 interface StyleguidePageProps {
   pageId: number;
 }
 
 export function StyleguidePage({ pageId }: StyleguidePageProps) {
-  const { clientId, accessToken } = getPreferenceValues<Preferences>();
-
-  if (!clientId || !accessToken) {
-    return null;
-  }
-
-  const { data, isLoading, revalidate } = useFetch(`${BASE_URL}/pages/${pageId}`, {
-    method: "GET",
-    headers: getAuthHeaders(clientId, accessToken),
-    keepPreviousData: true,
-    failureToastOptions: {
-      title: "Failed to get the page",
-      message: "Please try again later",
-      primaryAction: {
-        title: "Reload page",
-        onAction: (toast) => {
-          revalidate();
-          toast.hide();
-        },
-      },
-    },
-    mapResult(rawResponse: StyleguidePageResponse) {
-      const page = rawResponse.data.page;
-
-      const createdAt = new Date(page.created_at);
-      const updatedAt = new Date(page.updated_at || page.created_at);
-
-      return {
-        data: {
-          ...page,
-          name: formatPageName(page.name),
-          createdAt,
-          humanCreatedAtDate: createdAt.toLocaleDateString(),
-          updatedAt,
-          humanUpdatedAtDate: updatedAt.toLocaleDateString(),
-        },
-      };
-    },
-  });
+  const { data, isLoading, revalidate } = usePage(pageId);
 
   return (
     <Detail
@@ -65,15 +21,16 @@ export function StyleguidePage({ pageId }: StyleguidePageProps) {
         !isContentEmpty(data) && (
           <Detail.Metadata>
             <Detail.Metadata.Label
+              title="Access method"
+              text={data.locked ? "Private" : "Public"}
+              icon={data.locked ? Icon.Lock : Icon.LockUnlocked}
+            />
+            <Detail.Metadata.Label
               title="Visibility"
               text={data.hidden ? "Hidden" : "Visible"}
               icon={data.hidden ? Icon.EyeDisabled : Icon.Eye}
             />
-            <Detail.Metadata.Label
-              title="Security"
-              text={data.locked ? "Locked" : "Accessible"}
-              icon={data.locked ? Icon.Lock : Icon.LockUnlocked}
-            />
+            <StyleguideStatusTagDetailMetadataLabel pageId={pageId} />
           </Detail.Metadata>
         )
       }
