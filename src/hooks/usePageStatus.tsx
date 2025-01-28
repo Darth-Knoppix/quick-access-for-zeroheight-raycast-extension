@@ -1,6 +1,7 @@
 import { getPreferenceValues } from "@raycast/api";
-import { BASE_URL, getAuthHeaders, PageStatusResponse } from "../utils";
 import { useFetch } from "@raycast/utils";
+
+import { BASE_URL, getAuthHeaders, PageStatusResponse } from "../utils";
 
 export function usePageStatus(pageId: number) {
   const { clientId, accessToken } = getPreferenceValues<Preferences>();
