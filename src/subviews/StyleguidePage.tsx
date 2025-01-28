@@ -1,7 +1,14 @@
 import { Action, ActionPanel, Detail, getPreferenceValues, Icon } from "@raycast/api";
 import { useFetch } from "@raycast/utils";
 
-import { BASE_URL, formatPageName, getAuthHeaders, StyleguidePageData, StyleguidePageResponse } from "../utils";
+import {
+  BASE_URL,
+  formatPageName,
+  getAuthHeaders,
+  getContentOrDefault,
+  isContentEmpty,
+  StyleguidePageResponse,
+} from "../utils";
 
 interface StyleguidePageProps {
   pageId: number;
@@ -78,26 +85,4 @@ export function StyleguidePage({ pageId }: StyleguidePageProps) {
       }
     />
   );
-}
-
-function isContentEmpty(page: Pick<StyleguidePageData, "tabs" | "content">) {
-  if (!page.content && !page.tabs) return true;
-  if (page.content && page.content?.length === 0) return true;
-  if (page.tabs && page.tabs.length === 0) return true;
-
-  return false;
-}
-
-function getContentOrDefault(page: Pick<StyleguidePageData, "tabs" | "content">) {
-  if (isContentEmpty(page)) {
-    return `# No content found\n_This could be because there are blocks which the API can't currently display or there is no content on the page._`;
-  }
-
-  if (page.tabs) {
-    return page.tabs
-      .toSorted((tabA, tabB) => tabB.order - tabA.order)
-      .reduce((acc, curr) => acc + `${curr.name}\n\n---\n\n${curr.content}`, "");
-  }
-
-  return page.content;
 }

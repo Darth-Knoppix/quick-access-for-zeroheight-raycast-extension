@@ -1,11 +1,4 @@
-import { getPreferenceValues, showToast, Toast } from "@raycast/api";
-
 export const BASE_URL = "https://zeroheight.com/open_api/v2/";
-
-interface Preferences {
-  accessToken?: string;
-  clientId?: string;
-}
 
 export interface StyleguideListResponse {
   status: string;
@@ -57,45 +50,32 @@ export function formatPageName(name?: string) {
   return name ?? "Untitled page";
 }
 
-export async function getStyleguides() {
-  return getFromAPI<StyleguideListResponse>("/styleguides");
-}
-
-async function getFromAPI<R>(path: string): Promise<R | undefined> {
-  const { clientId, accessToken } = getPreferenceValues<Preferences>();
-  try {
-    if (!clientId || !accessToken) {
-      throw new Error("Configure your Client ID and Access Token before running this command.");
-    }
-
-    const response = await fetch(BASE_URL + path, {
-      method: "GET",
-      headers: getAuthHeaders(clientId, accessToken),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Invalid response from server: ${response.status}`);
-    }
-
-    const payload = await response.json();
-
-    return payload as R;
-  } catch (error) {
-    if (error instanceof Error) {
-      await showToast({
-        style: Toast.Style.Failure,
-        title: "Something went wrong calling the zeroheight API.",
-      });
-
-      return;
-    }
-  }
-}
-
 export function getAuthHeaders(clientId: string, accessToken: string) {
   return {
     "X-API-CLIENT": clientId,
     "X-API-KEY": accessToken,
     "Content-Type": "application/json",
   };
+}
+
+export function isContentEmpty(page: Pick<StyleguidePageData, "tabs" | "content">) {
+  if (!page.content && !page.tabs) return true;
+  if (page.content && page.content?.length === 0) return true;
+  if (page.tabs && page.tabs.length === 0) return true;
+
+  return false;
+}
+
+export function getContentOrDefault(page: Pick<StyleguidePageData, "tabs" | "content">) {
+  if (isContentEmpty(page)) {
+    return `# No content found\n_This could be because there are blocks which the API can't currently display or there is no content on the page._`;
+  }
+
+  if (page.tabs) {
+    return page.tabs
+      .toSorted((tabA, tabB) => tabB.order - tabA.order)
+      .reduce((acc, curr) => acc + `${curr.name}\n\n---\n\n${curr.content}`, "");
+  }
+
+  return page.content;
 }
