@@ -44,7 +44,7 @@ export function StyleguidePageList({ styleguideId, styleguideName }: StyleguideP
           }}
         >
           <List.Dropdown.Item title="Alphabetical" value="name" />
-          <List.Dropdown.Item title="Recently updated" value="updated_at" />
+          <List.Dropdown.Item title="Recently Updated" value="updated_at" />
           <List.Dropdown.Item title="Newest" value="created_at" />
         </List.Dropdown>
       }
