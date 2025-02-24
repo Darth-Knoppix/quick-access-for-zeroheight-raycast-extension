@@ -30,6 +30,7 @@ export default function Command() {
 
   return (
     <List
+      navigationTitle="Styleguides"
       isLoading={isLoading}
       searchBarAccessory={
         <List.Dropdown
