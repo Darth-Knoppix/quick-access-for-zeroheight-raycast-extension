@@ -104,6 +104,10 @@ export function statusIdToColor(id?: string) {
   );
 }
 
+/**
+ * Parse date or return null when invalid
+ * @param rawDate date string
+ */
 export function parseDate(rawDate: string) {
   const parsedDate = new Date(rawDate);
 

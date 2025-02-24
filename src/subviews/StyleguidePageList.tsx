@@ -24,9 +24,15 @@ export function StyleguidePageList({ styleguideId, styleguideName }: StyleguideP
     if (sorting === "name") {
       newSortedPages = data?.toSorted((a, b) => a.name.localeCompare(b.name));
     } else if (sorting === "created_at") {
-      newSortedPages = data?.toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      newSortedPages = data?.toSorted((a, b) => {
+        if (!b.createdAt || !a.createdAt) return 0;
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      });
     } else if (sorting === "updated_at") {
-      newSortedPages = data?.toSorted((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+      newSortedPages = data?.toSorted((a, b) => {
+        if (!b.updatedAt || !a.updatedAt) return 0;
+        return b.updatedAt.getTime() - a.updatedAt.getTime();
+      });
     }
 
     setSortedPages(newSortedPages);
@@ -58,7 +64,7 @@ export function StyleguidePageList({ styleguideId, styleguideName }: StyleguideP
         <List.Item
           key={page.id}
           title={page.name}
-          subtitle={`Updated ${page.humanUpdatedAtDate}`}
+          subtitle={page.humanUpdatedAtDate ? `Updated ${page.humanUpdatedAtDate}` : "Never updated"}
           actions={
             <ActionPanel>
               <Action.Push title="View Page" target={<StyleguidePage pageId={page.id} />} />

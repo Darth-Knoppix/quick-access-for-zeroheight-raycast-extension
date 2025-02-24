@@ -1,7 +1,7 @@
 import { getPreferenceValues, showToast, Toast } from "@raycast/api";
 import { useFetch } from "@raycast/utils";
 
-import { BASE_URL, formatPageName, getAuthHeaders, StyleguidePageListResponse } from "../utils";
+import { BASE_URL, formatPageName, getAuthHeaders, parseDate, StyleguidePageListResponse } from "../utils";
 
 export function usePageList(styleguideId: number) {
   const { clientId, accessToken } = getPreferenceValues<Preferences>();
@@ -39,16 +39,16 @@ export function usePageList(styleguideId: number) {
     },
     mapResult(rawResponse: StyleguidePageListResponse) {
       const pages = rawResponse.data.pages.map((page) => {
-        const createdAt = new Date(page.created_at);
-        const updatedAt = new Date(page.updated_at || page.created_at);
+        const createdAt = parseDate(page.created_at);
+        const updatedAt = parseDate(page.updated_at || page.created_at);
 
         return {
           ...page,
           name: formatPageName(page.name),
           createdAt,
-          humanCreatedAtDate: createdAt.toLocaleDateString(),
+          humanCreatedAtDate: createdAt?.toLocaleDateString(),
           updatedAt,
-          humanUpdatedAtDate: updatedAt.toLocaleDateString(),
+          humanUpdatedAtDate: updatedAt?.toLocaleDateString(),
         };
       });
 
