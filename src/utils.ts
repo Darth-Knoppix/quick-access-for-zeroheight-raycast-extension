@@ -103,3 +103,10 @@ export function statusIdToColor(id?: string) {
     }?.[id] ?? "#F2F1F2"
   );
 }
+
+export function parseDate(rawDate: string) {
+  const parsedDate = new Date(rawDate);
+
+  if (Number.isNaN(parsedDate.valueOf())) return null;
+  return parsedDate;
+}
