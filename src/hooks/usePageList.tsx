@@ -9,6 +9,7 @@ export function usePageList(styleguideId: number) {
   const props = useFetch(`${BASE_URL}/styleguides/${styleguideId}/pages`, {
     method: "GET",
     headers: getAuthHeaders(clientId, accessToken),
+    keepPreviousData: true,
     async onError(e) {
       if (e.message === "Unauthorized") {
         await showToast({
