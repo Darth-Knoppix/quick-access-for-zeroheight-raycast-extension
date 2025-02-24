@@ -11,8 +11,8 @@ export interface StyleguideListItemData {
   id: number;
   name: string;
   share_id: string;
-  humanCreatedAt: string;
-  createdAt: Date;
+  humanCreatedAt?: string;
+  createdAt: Date | null;
 }
 
 export interface StyleguidePageListResponse {

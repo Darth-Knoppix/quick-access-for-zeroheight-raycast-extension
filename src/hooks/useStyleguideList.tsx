@@ -1,7 +1,7 @@
 import { getPreferenceValues, showToast, Toast } from "@raycast/api";
 import { useFetch } from "@raycast/utils";
 
-import { BASE_URL, getAuthHeaders, StyleguideListItemData, StyleguideListResponse } from "../utils";
+import { BASE_URL, getAuthHeaders, parseDate, StyleguideListItemData, StyleguideListResponse } from "../utils";
 
 export function useStyleguideList() {
   const { clientId, accessToken } = getPreferenceValues<Preferences>();
@@ -41,12 +41,15 @@ export function useStyleguideList() {
         }
       },
       mapResult(rawResponse) {
-        const styleguides = rawResponse.data.styleguides.map((styleguide) => ({
-          ...styleguide,
-          name: styleguide.name ?? "Untitled styleguide",
-          humanCreatedAt: new Date(styleguide.created_at).toLocaleDateString(),
-          createdAt: new Date(styleguide.created_at),
-        }));
+        const styleguides = rawResponse.data.styleguides.map((styleguide) => {
+          const createdAt = parseDate(styleguide.created_at);
+          return {
+            ...styleguide,
+            name: styleguide.name ?? "Untitled styleguide",
+            humanCreatedAt: createdAt?.toLocaleDateString(),
+            createdAt: createdAt,
+          };
+        });
 
         return {
           data: styleguides,
