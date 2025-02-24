@@ -15,11 +15,14 @@ export default function Command() {
   useEffect(() => {
     if (!data) return;
 
-    let newSortedStyleguides = [...data];
+    let newSortedStyleguides = data;
     if (sorting === "name") {
-      newSortedStyleguides = data?.toSorted((a, b) => a.name.localeCompare(b.name));
+      newSortedStyleguides = data.toSorted((a, b) => a.name.localeCompare(b.name));
     } else if (sorting === "created_at") {
-      newSortedStyleguides = data?.toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      newSortedStyleguides = data.toSorted((a, b) => {
+        if (!a.createdAt || !b.createdAt) return 0;
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      });
     }
 
     setSortedStyleguides(newSortedStyleguides);
@@ -45,7 +48,7 @@ export default function Command() {
         </ActionPanel>
       }
     >
-      {sortedStyleguides?.map((styleguide) => (
+      {sortedStyleguides.map((styleguide) => (
         <List.Item
           key={styleguide.id}
           title={styleguide.name}

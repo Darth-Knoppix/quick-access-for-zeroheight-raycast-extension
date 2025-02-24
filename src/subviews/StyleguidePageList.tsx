@@ -15,21 +15,21 @@ export function StyleguidePageList({ styleguideId, styleguideName }: StyleguideP
 
   const { data, isLoading, revalidate } = usePageList(styleguideId);
 
-  const [sortedPages, setSortedPages] = useState(data);
+  const [sortedPages, setSortedPages] = useState(data ?? []);
 
   useEffect(() => {
     if (!data) return;
 
-    let newSortedPages = [...data];
+    let newSortedPages = data;
     if (sorting === "name") {
-      newSortedPages = data?.toSorted((a, b) => a.name.localeCompare(b.name));
+      newSortedPages = data.toSorted((a, b) => a.name.localeCompare(b.name));
     } else if (sorting === "created_at") {
-      newSortedPages = data?.toSorted((a, b) => {
+      newSortedPages = data.toSorted((a, b) => {
         if (!b.createdAt || !a.createdAt) return 0;
         return b.createdAt.getTime() - a.createdAt.getTime();
       });
     } else if (sorting === "updated_at") {
-      newSortedPages = data?.toSorted((a, b) => {
+      newSortedPages = data.toSorted((a, b) => {
         if (!b.updatedAt || !a.updatedAt) return 0;
         return b.updatedAt.getTime() - a.updatedAt.getTime();
       });

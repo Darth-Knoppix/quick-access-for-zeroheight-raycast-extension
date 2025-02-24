@@ -16,7 +16,7 @@ export function StyleguideStatusTagDetailMetadataLabel({ pageId }: StyleguideSta
 
   return (
     <Detail.Metadata.TagList title="Status">
-      <Detail.Metadata.TagList.Item text={data?.name} color={statusIdToColor(data?.id)} />
+      <Detail.Metadata.TagList.Item text={data.name} color={statusIdToColor(data.id)} />
     </Detail.Metadata.TagList>
   );
 }

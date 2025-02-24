@@ -68,7 +68,7 @@ export function getAuthHeaders(clientId: string, accessToken: string) {
 
 export function isContentEmpty(page: Pick<StyleguidePageData, "tabs" | "content">) {
   if (!page.content && !page.tabs) return true;
-  if (page.content && page.content?.length === 0) return true;
+  if (page.content && page.content.length === 0) return true;
   if (page.tabs && page.tabs.length === 0) return true;
 
   return false;
